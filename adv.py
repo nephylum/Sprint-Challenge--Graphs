@@ -68,28 +68,31 @@ class Graph:
             return None
         return self.vertices[vertex_id]
 
-    def bfs(self, starting_vertex, destination_vertex):
+    def bfs(self, starting_vertex):
         """
         Return a list containing the shortest path from
         starting_vertex to destination_vertex in
-        breath-first order.
+        breadth-first order.
         """
         q = Queue()
-        path = [starting_vertex]
-        q.enqueue(path)
-        visited = set()
+        exits = self.get_exits(starting_vertex)
+        print('exits:', exits)
+        # for exit in exits:
+        #     #print(exit)
+        q.enqueue(exits)
+        path = []
+        
         while q.size() > 0:
-            path = q.dequeue()
-            v = path[-1]
-            if v not in visited:
-                visited.add(v)
-                if v == destination_vertex:
-                    return path
+            v = q.dequeue()
+            print('v:', v)
+            path.append(v)
+            if v == '?':
+                return path
 
-                for next_vert in self.get_neighbors(v):
-                    newpath = list(path)
-                    newpath.append(next_vert)
-                    q.enqueue(newpath)
+            for next_vert in self.get_exits():
+                newpath = list(path)
+                newpath.append(next_vert)
+                q.enqueue(newpath)
 
 # Fill this out with directions to walk
 ###
@@ -100,38 +103,44 @@ g.add_vertex(cur.id)
 g.add_exits(cur.id, cur.get_exits())
 move = 'w'
 traversal_path = []
-while move != None:
-    prev_room = player.current_room.id
-    print(move)
-    player.travel(move)
-    traversal_path.append(move)
+while len(g.vertices) < 500:
+    while move != None:
+        prev_room = player.current_room.id
+        print(move)
+        player.travel(move)
+        traversal_path.append(move)
 
-    #link previous room
-    cur = player.current_room
-    g.vertices[prev_room][move] = cur.id
+        #link previous room
+        cur = player.current_room
+        g.vertices[prev_room][move] = cur.id
 
-    if cur.id not in g.vertices:
-        g.add_vertex(cur.id)
-        g.add_exits(cur.id, cur.get_exits())
-    #add link to previous room
-    if move =='n':
-        g.vertices[cur.id]['s'] = prev_room
-    elif move == 's':
-        g.vertices[cur.id]['n'] = prev_room
-    elif move == 'e':
-        g.vertices[cur.id]['w'] = prev_room
-    elif move == 'w':
-        g.vertices[cur.id]['e'] = prev_room
-    #pick a direction to move in
-    poss_moves = []
-    for x in g.vertices[cur.id]:
-        if g.vertices[cur.id][x] == '?':
-            poss_moves.append(x)
-    if len(poss_moves) == 0:
-         move = None
-    else:
-        move = poss_moves[0]
-print('time to implement!')
+        if cur.id not in g.vertices:
+            g.add_vertex(cur.id)
+            g.add_exits(cur.id, cur.get_exits())
+        #add link to previous room
+        if move =='n':
+            g.vertices[cur.id]['s'] = prev_room
+        elif move == 's':
+            g.vertices[cur.id]['n'] = prev_room
+        elif move == 'e':
+            g.vertices[cur.id]['w'] = prev_room
+        elif move == 'w':
+            g.vertices[cur.id]['e'] = prev_room
+        #pick a direction to move in
+        poss_moves = []
+        for x in g.vertices[cur.id]:
+            if g.vertices[cur.id][x] == '?':
+                poss_moves.append(x)
+        if len(poss_moves) == 0:
+             move = None
+        else:
+            move = poss_moves[0]
+    print('time to implement!')
+    goback = g.bfs(player.current_room.id)
+    print(goback)
+    for step in goback:
+        player.travel(step)
+    traversal_path.append(goback)
     # if 'n' in g.vertices[cur.id]:
     #     if g.vertices[cur.id]['n'] == '?':
     #         move = 'n'
@@ -149,8 +158,7 @@ print('time to implement!')
     #      move = None
 
 ###
-# traversal_path = ['n', 'n']
-traversal_path = []
+
 
 
 
