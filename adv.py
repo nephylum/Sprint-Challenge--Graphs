@@ -48,7 +48,7 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        self.vertices[vertex_id] = set()
+        self.vertices[vertex_id] = {}
 
     def add_exits(self, room, exits):
         """
@@ -57,7 +57,8 @@ class Graph:
         output:  0:{'n':'?','s':'?','e':'?','w':'?'}
         """
         if room in self.vertices:
-            self.vertices[room] = exits
+            for exit in exits:
+                self.vertices[room][exit] = '?'
 
     def get_exits(self, vertex_id):
         """
@@ -97,11 +98,14 @@ g = Graph()
 cur = player.current_room
 g.add_vertex(cur.id)
 g.add_exits(cur.id, cur.get_exits())
-move = 'n'
-traversal_path = [move]
+move = 'w'
+traversal_path = []
 while move != None:
     prev_room = player.current_room.id
+    print(move)
     player.travel(move)
+    traversal_path.append(move)
+
     #link previous room
     cur = player.current_room
     g.vertices[prev_room][move] = cur.id
@@ -110,17 +114,40 @@ while move != None:
         g.add_vertex(cur.id)
         g.add_exits(cur.id, cur.get_exits())
     #add link to previous room
-    if move = 'n':
+    if move =='n':
         g.vertices[cur.id]['s'] = prev_room
-    elif move = 's':
+    elif move == 's':
         g.vertices[cur.id]['n'] = prev_room
-    elif move = 'e':
+    elif move == 'e':
         g.vertices[cur.id]['w'] = prev_room
-    elif move = 'w':
+    elif move == 'w':
         g.vertices[cur.id]['e'] = prev_room
     #pick a direction to move in
-    for exit in g.vertices[cur.id]:
-        if exit = '?'
+    poss_moves = []
+    for x in g.vertices[cur.id]:
+        if g.vertices[cur.id][x] == '?':
+            poss_moves.append(x)
+    if len(poss_moves) == 0:
+         move = None
+    else:
+        move = poss_moves[0]
+print('time to implement!')
+    # if 'n' in g.vertices[cur.id]:
+    #     if g.vertices[cur.id]['n'] == '?':
+    #         move = 'n'
+    # if 's' in g.vertices[cur.id]:
+    #     if g.vertices[cur.id]['s'] == '?':
+    #         move = 's'
+    # if 'e' in g.vertices[cur.id]:
+    #     if g.vertices[cur.id]['e'] == '?':
+    #         move = 'e'
+    # if 'w' in g.vertices[cur.id]:
+    #     if g.vertices[cur.id]['s'] == '?':
+    #         move = 's'
+    # elif ((g.vertices[cur.id]['n'] != '?') and (g.vertices[cur.id]['s'] != '?')
+    #     and (g.vertices[cur.id]['e'] != '?') and (g.vertices[cur.id]['w'] != '?')):
+    #      move = None
+
 ###
 # traversal_path = ['n', 'n']
 traversal_path = []
@@ -147,12 +174,12 @@ else:
 #######
 # UNCOMMENT TO WALK AROUND
 #######
-player.current_room.print_room_description(player)
-while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
