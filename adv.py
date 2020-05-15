@@ -76,23 +76,80 @@ class Graph:
         """
         q = Queue()
         exits = self.get_exits(starting_vertex)
-        print('exits:', exits)
-        # for exit in exits:
-        #     #print(exit)
-        q.enqueue(exits)
-        path = []
-        
+        for exit in exits:
+            print(exits[exit])
+            path = [{exit:exits[exit]}]
+            print('this is the path', path)
+            q.enqueue(path)
+        visited = set()
         while q.size() > 0:
-            v = q.dequeue()
-            print('v:', v)
-            path.append(v)
-            if v == '?':
-                return path
+            path = q.dequeue()
+            v = path[-1]
+            # if v not in visited:
+            #     visited.add(v)
 
-            for next_vert in self.get_exits():
+            print('this is v', v)
+            for k, d in v.items():
+                dir = k
+                room = d
+            print('room now:', room)
+            print('path', path)
+            if room == '?':
+                dirback = []
+                print('\npath before:', path)
+
+                for d in path:
+                    for k in d:
+                        dirback.append(k)
+                print('DIRECTIONS BACK:', dirback)
+                return dirback
+
+            exits = self.get_exits(room)
+            for exit in exits:
                 newpath = list(path)
-                newpath.append(next_vert)
+                newpath.append({exit:exits[exit]})
                 q.enqueue(newpath)
+
+
+
+        # q = Queue()
+        # cur = starting_vertex
+        # for dir, room in self.get_exits(cur).items():
+        #     q.enqueue([{dir:room}])
+        #     print('DIR:', dir, 'Rooms:', room)
+        # # for exit in exits:
+        # #     #print(exit)
+        # path = []
+        #
+        # while q.size() > 0:
+        #     v = q.dequeue()
+        #     print('v', v)
+        #     for key, val in v[-1].items():
+        #         dir = key
+        #         room = val
+        #
+        #     print('dir:', dir, 'val', val)
+        #     path.append(v)
+        #     print('path', path)
+        #     # if room == '?':
+        #     #     return path
+        #     print('room:', room)
+        #     print('outside:', self.get_exits(room))
+        #
+        #     for dir, rm in self.get_exits(val).items():
+        #         #print('dir, room', dir, rm)
+        #         if rm == '?':
+        #             dirback = []
+        #             print('\npath before:', path)
+        #
+        #             for d in path:
+        #                 for k in d:
+        #                     dirback.append(k)
+        #             print('DIRECTIONS BACK:', dirback)
+        #             return dirback
+        #         newpath = path
+        #         newpath.append({dir:rm})
+        #         q.enqueue(newpath)
 
 # Fill this out with directions to walk
 ###
@@ -103,13 +160,16 @@ g.add_vertex(cur.id)
 g.add_exits(cur.id, cur.get_exits())
 move = 'w'
 traversal_path = []
+
 while len(g.vertices) < 500:
+    print('\n\n----graph size :', len(g.vertices), '\n\n')
     while move != None:
         prev_room = player.current_room.id
-        print(move)
+        print('\ndirection moved:',move)
+
         player.travel(move)
         traversal_path.append(move)
-
+        print(traversal_path)
         #link previous room
         cur = player.current_room
         g.vertices[prev_room][move] = cur.id
@@ -127,20 +187,25 @@ while len(g.vertices) < 500:
         elif move == 'w':
             g.vertices[cur.id]['e'] = prev_room
         #pick a direction to move in
+        print('\n\n----graph size :', len(g.vertices), '\n\n')
         poss_moves = []
         for x in g.vertices[cur.id]:
             if g.vertices[cur.id][x] == '?':
                 poss_moves.append(x)
+        print('possible moves', poss_moves)
         if len(poss_moves) == 0:
              move = None
+             print('room', cur.id, 'exits:', g.vertices[cur.id])
         else:
+
             move = poss_moves[0]
     print('time to implement!')
     goback = g.bfs(player.current_room.id)
     print(goback)
     for step in goback:
         player.travel(step)
-    traversal_path.append(goback)
+        traversal_path.append(step)
+    move = goback[-1]
     # if 'n' in g.vertices[cur.id]:
     #     if g.vertices[cur.id]['n'] == '?':
     #         move = 'n'
