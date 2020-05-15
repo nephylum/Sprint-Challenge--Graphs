@@ -77,79 +77,72 @@ class Graph:
         q = Queue()
         exits = self.get_exits(starting_vertex)
         for exit in exits:
-            print(exits[exit])
             path = [{exit:exits[exit]}]
-            print('this is the path', path)
+
             q.enqueue(path)
-        visited = set()
         while q.size() > 0:
             path = q.dequeue()
-            v = path[-1]
-            # if v not in visited:
-            #     visited.add(v)
+            #print('this is the path', path)
+            newexits = []
 
-            print('this is v', v)
-            for k, d in v.items():
-                dir = k
-                room = d
-            print('room now:', room)
-            print('path', path)
-            if room == '?':
-                dirback = []
-                print('\npath before:', path)
+            for x in path[-1]:
+                cur_room = path[-1][x]
+                dir = x
 
-                for d in path:
-                    for k in d:
-                        dirback.append(k)
-                print('DIRECTIONS BACK:', dirback)
-                return dirback
+            exits = self.get_exits(cur_room)
 
-            exits = self.get_exits(room)
             for exit in exits:
-                newpath = list(path)
-                newpath.append({exit:exits[exit]})
+                if exits[exit] =='?':
+                    print('before clean:', path[-1])
+                    retpath = []
+                    for x in path[-1]:
+                        retpath.append(x)
+                    print('before return', retpath)
+                    return retpath
+                else:
+                    newexits.append({exit:exits[exit]})
+            print(newexits)
+            for x in newexits:
+                print('exit:', x)
+                newpath = path
+                newpath.append(x)
                 q.enqueue(newpath)
-
-
-
         # q = Queue()
-        # cur = starting_vertex
-        # for dir, room in self.get_exits(cur).items():
-        #     q.enqueue([{dir:room}])
-        #     print('DIR:', dir, 'Rooms:', room)
-        # # for exit in exits:
-        # #     #print(exit)
-        # path = []
-        #
+        # exits = self.get_exits(starting_vertex)
+        # for exit in exits:
+        #     print(exits[exit])
+        #     path = [{exit:exits[exit]}]
+        #     print('this is the path', path)
+        #     q.enqueue(path)
+        # visited = set()
         # while q.size() > 0:
-        #     v = q.dequeue()
-        #     print('v', v)
-        #     for key, val in v[-1].items():
-        #         dir = key
-        #         room = val
+        #     path = q.dequeue()
+        #     v = path[-1]
+        #     # if v not in visited:
+        #     #     visited.add(v)
         #
-        #     print('dir:', dir, 'val', val)
-        #     path.append(v)
+        #     print('this is v', v)
+        #     for k, d in v.items():
+        #         dir = k
+        #         room = d
+        #     print('room now:', room)
         #     print('path', path)
-        #     # if room == '?':
-        #     #     return path
-        #     print('room:', room)
-        #     print('outside:', self.get_exits(room))
+        #     if room == '?':
+        #         dirback = []
+        #         print('\npath before:', path)
         #
-        #     for dir, rm in self.get_exits(val).items():
-        #         #print('dir, room', dir, rm)
-        #         if rm == '?':
-        #             dirback = []
-        #             print('\npath before:', path)
+        #         for d in path:
+        #             for k in d:
+        #                 dirback.append(k)
+        #         print('DIRECTIONS BACK:', dirback)
+        #         return dirback[:-1]
         #
-        #             for d in path:
-        #                 for k in d:
-        #                     dirback.append(k)
-        #             print('DIRECTIONS BACK:', dirback)
-        #             return dirback
-        #         newpath = path
-        #         newpath.append({dir:rm})
+        #     exits = self.get_exits(room)
+        #     for exit in exits:
+        #         newpath = list(path)
+        #         newpath.append({exit:exits[exit]})
         #         q.enqueue(newpath)
+
 
 # Fill this out with directions to walk
 ###
@@ -172,6 +165,7 @@ while len(g.vertices) < 500:
         print(traversal_path)
         #link previous room
         cur = player.current_room
+        print('current room:',cur.id, 'previous room', prev_room,'move',move)
         g.vertices[prev_room][move] = cur.id
 
         if cur.id not in g.vertices:
@@ -179,15 +173,20 @@ while len(g.vertices) < 500:
             g.add_exits(cur.id, cur.get_exits())
         #add link to previous room
         if move =='n':
-            g.vertices[cur.id]['s'] = prev_room
+            if g.vertices[cur.id]['s'] == '?':
+                g.vertices[cur.id]['s'] = prev_room
         elif move == 's':
-            g.vertices[cur.id]['n'] = prev_room
+            if g.vertices[cur.id]['n'] == '?':
+                g.vertices[cur.id]['n'] = prev_room
         elif move == 'e':
-            g.vertices[cur.id]['w'] = prev_room
+            if g.vertices[cur.id]['w'] == '?':
+                g.vertices[cur.id]['w'] = prev_room
         elif move == 'w':
-            g.vertices[cur.id]['e'] = prev_room
+            if g.vertices[cur.id]['e'] == '?':
+                g.vertices[cur.id]['e'] = prev_room
         #pick a direction to move in
         print('\n\n----graph size :', len(g.vertices), '\n\n')
+
         poss_moves = []
         for x in g.vertices[cur.id]:
             if g.vertices[cur.id][x] == '?':
